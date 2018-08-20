@@ -157,5 +157,13 @@ venv.bak/
 .mypy_cache/
 
 # project-specific
+# emoji configs
 custom_emoji/*.json
+# emoji images
 custom_emoji/img/
+# index definitions
+custom_emoji/*.idx
+custom_emoji/*.dat
+
+# Ignore samples (won't have emojis)
+samples/*.html
