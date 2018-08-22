@@ -167,3 +167,5 @@ custom_emoji/*.dat
 
 # Ignore samples (won't have emojis)
 samples/*.html
+
+slack.env
