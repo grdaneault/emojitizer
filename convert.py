@@ -18,7 +18,7 @@ index_color = index.Index("full_emoji", properties=properties)
 index_nocolor = index.Index("current_emoji", properties=properties)
 
 
-def convert_image(img, display_size=32, write_file=False, write_screen=True, write_img=False, max_width=None, max_cols=48, max_height=None, max_rows=32, min_chunk_size=16, include_tones=False, include_colors=True):
+def convert_image(img, display_size=32, write_file=False, write_screen=True, write_img=False, max_width=None, max_cols=48, max_height=None, max_rows=32, min_chunk_size=16, include_tones=False, include_colors=True, outdir="samples/converted"):
     print("Converting Image " + img)
     im = rgbtize(Image.open(img))
 
@@ -82,13 +82,15 @@ def convert_image(img, display_size=32, write_file=False, write_screen=True, wri
             print(msg)
             print("-" * 80)
 
+    name = os.path.basename(file)
     if write_file:
-        with open(file + ".html", "w") as out:
+        with open(os.path.join(outdir, file) + ".html", "w") as out:
             out.write(html)
 
 
     if write_img:
-        out_img.save("samples/converted/{}.png".format(os.path.basename(file)))
+        out_img.save(os.path.join(outdir, "{}.png".format(name)))
+
     return messages
 
 
@@ -102,6 +104,6 @@ if __name__ == '__main__':
             print("already have {}".format(img))
             continue
 
-        convert_image("samples/" + img, write_file=True, write_screen=False, write_img=True, max_width=1820, max_height=880, display_size=8)
+        convert_image("samples/" + img, write_file=True, write_screen=False, write_img=True, max_width=1920, max_height=1080, display_size=8)
 
 
