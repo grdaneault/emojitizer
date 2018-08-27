@@ -17,6 +17,3 @@ for config in glob.glob("*.json"):
             emoji['name'] = emoji['name'].strip(":")
             print("{name}: {url}".format(**emoji))
             download_file(**emoji)
-
-
-

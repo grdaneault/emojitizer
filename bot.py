@@ -11,7 +11,7 @@ client = SlackClient(os.environ.get('SLACK_TOKEN_2'))
 
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 EMOJITIZE_COMMAND = "emojitize"
-MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+MENTION_REGEX = "^(<@(|[WU].+?)>|bender)(.*)"
 
 
 def parse_bot_commands(slack_events):
@@ -23,7 +23,7 @@ def parse_bot_commands(slack_events):
     for event in slack_events:
         if event["type"] == "message" and not "subtype" in event:
             user_id, message = parse_direct_mention(event["text"])
-            if user_id == starterbot_id:
+            if user_id in [starterbot_id, "bender"]:
                 return message, event["channel"]
     return None, None
 
@@ -35,7 +35,7 @@ def parse_direct_mention(message_text):
     """
     matches = re.search(MENTION_REGEX, message_text)
     # the first group contains the username, the second group contains the remaining message
-    return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
+    return (matches.group(1) or matches.group(2), matches.group(3).strip()) if matches else (None, None)
 
 
 def handle_command(command, channel):
@@ -47,17 +47,17 @@ def handle_command(command, channel):
     response = None
     # This is where you start to implement more commands!
     if command.startswith(EMOJITIZE_COMMAND):
-        cmd, url = command.split("\s+", 2)
-        resp = requests.get(url, allow_redirects=True)
-        file_type = url.split(".")[-1]
-        name = "/tmp/image.{}".format(file_type)
-        open(name, 'wb').write(resp.content)
-        messages = convert_image(name)
-        for msg in messages:
+        cmd, url = command.split(" ", 2)
+        name = url
+        if not url.startswith("samples/"):
+            resp = requests.get(url[1:-1], allow_redirects=True)
+            name = "/tmp/emojitize"
+            open(name, 'wb').write(resp.content)
+        messages = convert_image(name, include_colors=False)
+        for message in messages:
             client.api_call("chat.postMessage",
                             channel=channel,
-                            text=msg)
-            time.sleep(0.1)
+                            text=message)
 
 
 if __name__ == "__main__":
